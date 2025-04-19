@@ -5,6 +5,7 @@ package kmeans
 import (
 	"fmt"
 	"math/rand"
+	"sync/atomic"
 
 	"github.com/muesli/clusters"
 	"github.com/neurlang/classifier/parallel"
@@ -61,10 +62,11 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 	}
 
 	points := make([]int, len(dataset))
-	changes := 1
+	var changes atomic.Uint64()
+	changes.Add(1)
 
-	for i := 0; changes > 0; i++ {
-		changes = 0
+	for i := 0; changes.Load() > 0; i++ {
+		changes.Set(0)
 		cc.Reset()
 
 		for p, point := range dataset {
@@ -72,7 +74,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 			cc[ci].Append(point)
 			if points[p] != ci {
 				points[p] = ci
-				changes++
+				changes.Add(1)
 			}
 		}
 
@@ -96,11 +98,11 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 
 				// Ensure that we always see at least one more iteration after
 				// randomly assigning a data point to a cluster
-				changes = len(dataset)
+				changes.Add(uint64(len(dataset)))
 			}
 		})
 
-		if changes > 0 {
+		if changes.Load() > 0 {
 			cc.Recenter()
 		}
 		if m.plotter != nil {
@@ -110,7 +112,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 			}
 		}
 		if i == m.iterationThreshold ||
-			changes < int(float64(len(dataset))*m.deltaThreshold) {
+			int(changes.Load()) < int(float64(len(dataset))*m.deltaThreshold) {
 			// fmt.Println("Aborting:", changes, int(float64(len(dataset))*m.TerminationThreshold))
 			break
 		}
