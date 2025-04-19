@@ -76,7 +76,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 			mut.RLock()
 			ci := cc.Nearest(point)
 			mut.RUnlock()
-			mut.Unlock()
+			mut.Lock()
 			cc[ci].Append(point)
 			if points[p] != ci {
 				points[p] = ci
@@ -100,8 +100,9 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 					if len(cc[points[ri]].Observations) > 1 {
 						mut.RUnlock()
 						break
+					} else {
+						mut.RUnlock()
 					}
-					mut.RUnlock()
 				}
 				mut.Lock()
 				cc[ci].Append(dataset[ri])
