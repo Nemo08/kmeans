@@ -12,6 +12,8 @@ import (
 
 // Kmeans configuration/option struct
 type Kmeans struct {
+	// number of threads
+	Threads int
 	// when a plotter is set, Plot gets called after each iteration
 	plotter Plotter
 	// deltaThreshold (in percent between 0.0 and 0.1) aborts processing if
