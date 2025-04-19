@@ -62,7 +62,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 	}
 
 	points := make([]int, len(dataset))
-	var changes atomic.Uint64()
+	var changes atomic.Uint64
 	changes.Add(1)
 
 	for i := 0; changes.Load() > 0; i++ {
