@@ -69,17 +69,19 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 	for i := 0; changes.Load() > 0; i++ {
 		changes.Store(0)
 		cc.Reset()
+		var mut sync.RWMutex
 
-		for p, point := range dataset {
+		parallel.ForEach(len(dataset), m.Threads, func (p int) {
+			point := dataset[p]
 			ci := cc.Nearest(point)
+			mut.Unlock()
 			cc[ci].Append(point)
 			if points[p] != ci {
 				points[p] = ci
 				changes.Add(1)
 			}
-		}
-
-		var mut sync.RWMutex
+			mut.Unlock()
+		})
 
 		parallel.ForEach(len(cc), m.Threads, func (ci int) {
 			if len(cc[ci].Observations) == 0 {
