@@ -78,6 +78,8 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 			}
 		}
 
+		var mut sync.RWMutex
+
 		parallel.ForEach(len(cc), m.Threads, func (ci int) {
 			if len(cc[ci].Observations) == 0 {
 				// During the iterations, if any of the cluster centers has no
@@ -89,12 +91,17 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 					// find a cluster with at least two data points, otherwise
 					// we're just emptying one cluster to fill another
 					ri = rand.Intn(len(dataset)) //nolint:gosec // rand.Intn is good enough for this
+					mut.RLock()
 					if len(cc[points[ri]].Observations) > 1 {
+						mut.RUnlock()
 						break
 					}
+					mut.RUnlock()
 				}
+				mut.Lock()
 				cc[ci].Append(dataset[ri])
 				points[ri] = ci
+				mut.Unlock()
 
 				// Ensure that we always see at least one more iteration after
 				// randomly assigning a data point to a cluster
