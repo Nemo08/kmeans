@@ -73,7 +73,9 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 
 		parallel.ForEach(len(dataset), m.Threads, func (p int) {
 			point := dataset[p]
+			mut.RLock()
 			ci := cc.Nearest(point)
+			mut.RUnlock()
 			mut.Unlock()
 			cc[ci].Append(point)
 			if points[p] != ci {
