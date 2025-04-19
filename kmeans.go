@@ -7,6 +7,7 @@ import (
 	"math/rand"
 
 	"github.com/muesli/clusters"
+	"github.com/neurlang/classifier/parallel"
 )
 
 // Kmeans configuration/option struct
@@ -73,7 +74,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 			}
 		}
 
-		for ci := 0; ci < len(cc); ci++ {
+		parallel.ForEach(len(cc), m.Threads, func (ci int) {
 			if len(cc[ci].Observations) == 0 {
 				// During the iterations, if any of the cluster centers has no
 				// data points associated with it, assign a random data point
@@ -95,7 +96,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 				// randomly assigning a data point to a cluster
 				changes = len(dataset)
 			}
-		}
+		})
 
 		if changes > 0 {
 			cc.Recenter()
