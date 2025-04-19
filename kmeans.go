@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"sync/atomic"
+	"sync"
 
 	"github.com/muesli/clusters"
 	"github.com/neurlang/classifier/parallel"
