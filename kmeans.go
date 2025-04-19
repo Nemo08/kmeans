@@ -66,7 +66,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 	changes.Add(1)
 
 	for i := 0; changes.Load() > 0; i++ {
-		changes.Set(0)
+		changes.Store(0)
 		cc.Reset()
 
 		for p, point := range dataset {
