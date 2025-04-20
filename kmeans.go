@@ -69,20 +69,20 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 	for i := 0; changes.Load() > 0; i++ {
 		changes.Store(0)
 		cc.Reset()
-		var mut sync.RWMutex
+		var mut [256]sync.RWMutex
 
 		parallel.ForEach(len(dataset), m.Threads, func (p int) {
 			point := dataset[p]
-			mut.RLock()
+			mut[p & 255].RLock()
 			ci := cc.Nearest(point)
-			mut.RUnlock()
-			mut.Lock()
+			mut[p & 255].RUnlock()
+			mut[ci & 255].Lock()
 			cc[ci].Append(point)
 			if points[p] != ci {
 				points[p] = ci
 				changes.Add(1)
 			}
-			mut.Unlock()
+			mut[ci & 255].Unlock()
 		})
 
 		parallel.ForEach(len(cc), m.Threads, func (ci int) {
@@ -96,18 +96,18 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 					// find a cluster with at least two data points, otherwise
 					// we're just emptying one cluster to fill another
 					ri = rand.Intn(len(dataset)) //nolint:gosec // rand.Intn is good enough for this
-					mut.RLock()
+					mut[ri & 255].RLock()
 					if len(cc[points[ri]].Observations) > 1 {
-						mut.RUnlock()
+						mut[ri & 255].RUnlock()
 						break
 					} else {
-						mut.RUnlock()
+						mut[ri & 255].RUnlock()
 					}
 				}
-				mut.Lock()
+				mut[ci & 255].Lock()
 				cc[ci].Append(dataset[ri])
 				points[ri] = ci
-				mut.Unlock()
+				mut[ci & 255].Unlock()
 
 				// Ensure that we always see at least one more iteration after
 				// randomly assigning a data point to a cluster
