@@ -1,4 +1,4 @@
-module github.com/neurlang/kmeans
+module github.com/muesli/kmeans
 
 go 1.12
 
