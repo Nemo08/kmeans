@@ -123,7 +123,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 			cc.Recenter()
 		}
 		if m.plotter != nil {
-			err := m.plotter.Plot(cc, -int(changes.Load()))
+			err := m.plotter.Plot(cc, i)
 			if err != nil {
 				return nil, fmt.Errorf("failed to plot chart: %s", err)
 			}
