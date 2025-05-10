@@ -8,7 +8,7 @@ import (
 	"sync/atomic"
 	"sync"
 
-	"github.com/muesli/clusters"
+	"github.com/neurlang/clusters"
 	"github.com/neurlang/classifier/parallel"
 )
 
@@ -68,7 +68,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 
 	for i := 0; changes.Load() > 0; i++ {
 		changes.Store(0)
-		cc.Reset()
+		cc.ResetThreads(m.Threads)
 		var mut [256]sync.RWMutex
 
 		parallel.ForEach(len(dataset), m.Threads, func (p int) {
@@ -120,7 +120,7 @@ func (m Kmeans) Partition(dataset clusters.Observations, k int) (clusters.Cluste
 		})
 
 		if changes.Load() > 0 {
-			cc.Recenter()
+			cc.RecenterThreads(m.Threads)
 		}
 		if m.plotter != nil {
 			err := m.plotter.Plot(cc, -int(changes.Load()))
