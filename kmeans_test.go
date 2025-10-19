@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"github.com/neurlang/clusters"
+	"github.com/Nemo08/clusters"
 )
 
 const (

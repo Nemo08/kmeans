@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"io/ioutil"
 
-	"github.com/muesli/clusters"
-	"github.com/muesli/kmeans"
-	"github.com/muesli/kmeans/plotter"
+	"github.com/Nemo08/clusters"
+	"github.com/Nemo08/kmeans"
+	"github.com/Nemo08/kmeans/plotter"
 
 	colorful "github.com/lucasb-eyer/go-colorful"
 )

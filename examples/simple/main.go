@@ -5,8 +5,8 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/muesli/clusters"
-	"github.com/muesli/kmeans"
+	"github.com/Nemo08/clusters"
+	"github.com/Nemo08/kmeans"
 )
 
 func main() {
